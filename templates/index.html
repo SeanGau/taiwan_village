@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <title>村里界圖查詢</title>
+    <style>
+        #geojson {
+            height: 500px;
+            width: 100%;
+            word-break: break-all;
+            background-color: #DDD;
+            padding: 1em;
+            overflow: auto;
+        }
+
+        input {
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid mt-2">
+        <p>此網頁使用 <a href="https://data.gov.tw/dataset/17219" target="_blank">政府開放資料之村里界圖</a></p>
+        <form>
+            <input type="text" name="city" id="city"> 縣市<br>
+            <input type="text" name="town" id="town"> 鄉鎮市區<br>
+            <input type="text" name="village" id="village"> 村里<br>
+            <input type="checkbox" name="simply" id="simply" checked> 簡化polygon<br>
+            <button id="check" class="btn btn-primary mb-2">查詢</button>
+            <textarea type="text" id="geojson" readonly>
+            </textarea>
+        </form>
+        <button id="copy" class="btn btn-primary mb-2">複製</button>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+        $("#check").on('click', function (e) {
+            e.preventDefault();
+            $("#geojson").val("");
+            $.ajax({
+                type: "GET",
+                url: "/api/village",
+                data: { city: $("#city").val(), town: $("#town").val(), village: $("#village").val(), simply: $("#simply").prop("checked") },
+                success: function (cb) {
+                    $("#geojson").val(cb);
+                }
+            });
+        });
+
+        $("#copy").on('click', function () {
+            $("#geojson").select();
+
+            /* Copy the text inside the text field */
+            document.execCommand("copy");
+
+            /* Alert the copied text */
+            alert("已複製geojson");
+        });
+    </script>
+</body>
+
+</html>
