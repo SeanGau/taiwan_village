@@ -1,3 +1,6 @@
+# DEMO
+https://village.collective.tw
+
 # 系統需求
 * postgresql+postgis
 * python3.7↑
