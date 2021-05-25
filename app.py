@@ -11,7 +11,10 @@ db = SQLAlchemy(app)
 
 @app.route('/')
 def index():
-    return flask.render_template('index.html')
+    data = None
+    with open('village_town_county.json') as json_file:
+	    data = json.load(json_file)
+    return flask.render_template('index.html', village_data = data)
 
 @app.route('/api/village')
 def village():

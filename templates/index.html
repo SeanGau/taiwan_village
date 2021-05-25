@@ -18,7 +18,7 @@
             overflow: auto;
         }
 
-        input {
+        input, select {
             margin-bottom: 0.5em;
         }
     </style>
@@ -28,9 +28,13 @@
     <div class="container-fluid mt-2">
         <p>此網頁使用 <a href="https://data.gov.tw/dataset/17219" target="_blank">政府開放資料之村里界圖</a></p>
         <form>
-            <input type="text" name="city" id="city"> 縣市<br>
-            <input type="text" name="town" id="town"> 鄉鎮市區<br>
-            <input type="text" name="village" id="village"> 村里<br>
+            <select type="text" name="city" id="city">
+                {% for county in village_data.keys() %}
+                <option value={{county}}>{{county}}</option>
+                {% endfor %}
+            </select>
+            <select type="text" name="town" id="town"></select>
+            <select type="text" name="village" id="village"></select><br>
             <input type="checkbox" name="simply" id="simply" checked> 簡化polygon<br>
             <button id="check" class="btn btn-primary mb-2">查詢</button>
             <textarea type="text" id="geojson" readonly>
@@ -41,6 +45,20 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script>
+        let village_data = {{ village_data|tojson|safe }};
+        
+        $("#city").on('change', function() {
+            $("#town").empty();
+            for(town in village_data[$(this).val()])
+                $("#town").append(`<option value=${town}>${town}</option>`)
+            $("#town").change();
+        })
+        $("#town").on('change', function() {
+            $("#village").empty();
+            for(village in village_data[$("#city").val()][$(this).val()])
+                $("#village").append(`<option value=${village}>${village}</option>`)
+        })
+
         $("#check").on('click', function (e) {
             e.preventDefault();
             $("#geojson").val("");
@@ -62,6 +80,10 @@
 
             /* Alert the copied text */
             alert("已複製geojson");
+        });
+
+        $(window).ready(function() {
+            $("#city").val("臺北市").change();
         });
     </script>
 </body>
